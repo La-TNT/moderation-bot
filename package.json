@@ -1,0 +1,25 @@
+{
+  "name": "moderation",
+  "version": "1.0.0",
+  "description": "modo bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "La_TNT",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^2.3.0",
+    "better-sqlite3": "^11.2.1",
+    "discord-anti-spam": "^2.8.1",
+    "discord-api-types": "^0.37.98",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "moderation": "file:",
+    "mongoose": "^8.6.0",
+    "ms": "^2.1.3",
+    "quick.db": "^9.1.7",
+    "sapphire": "^0.0.3",
+    "stack": "^0.1.0"
+  }
+}
