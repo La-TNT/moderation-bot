@@ -1,9 +1,30 @@
 require("dotenv").config();
 const fs = require("fs");
+const path = require('path');
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 
 // Importez la configuration
 const config = require("./config.js");
+
+// Chemin vers le fichier blacklist.json dans commands/staff/blacki
+const blacklistFile = path.join(__dirname, 'commands', 'staff', 'blacklist.json');
+
+// Fonction pour lire la liste noire
+function getBlacklist() {
+    if (!fs.existsSync(blacklistFile)) {
+        return [];
+    }
+    return JSON.parse(fs.readFileSync(blacklistFile, 'utf-8'));
+}
+
+// Fonction pour ajouter un serveur à la liste noire
+function addToBlacklist(guildId) {
+    const blacklist = getBlacklist();
+    if (!blacklist.includes(guildId)) {
+        blacklist.push(guildId);
+        fs.writeFileSync(blacklistFile, JSON.stringify(blacklist, null, 2));
+    }
+}
 
 // Créez une instance du client Discord
 const client = new Client({
@@ -49,6 +70,17 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args, client));
     }
 }
+
+// Événement déclenché lorsque le bot rejoint un nouveau serveur
+client.on('guildCreate', async (guild) => {
+    const blacklist = getBlacklist();
+
+    // Si le serveur est dans la liste noire, quitter immédiatement
+    if (blacklist.includes(guild.id)) {
+        await guild.leave();
+        console.log(`Le bot a quitté le serveur ${guild.name} (ID: ${guild.id}) car il est sur la liste noire.`);
+    }
+});
 
 // Gérez les erreurs non capturées
 process.on('uncaughtException', (err) => {
