@@ -3,8 +3,8 @@ const { MessageEmbed } = require('discord.js');
 const axios = require('axios');
 
 // Remplacez ces valeurs par vos propres clés API et ID de moteur
-const GOOGLE_API_KEY = 'AIzaSyCzaZH72xpNCwECkqvjJD0KC7l67V2H0H4';
-const CUSTOM_SEARCH_ENGINE_ID = '92bbfef2667cc40f9';
+const GOOGLE_API_KEY = 'Votre clé API';
+const CUSTOM_SEARCH_ENGINE_ID = 'Votre clé de recherche';
 
 module.exports = {
     data: new SlashCommandBuilder()
