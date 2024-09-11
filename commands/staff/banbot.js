@@ -33,8 +33,8 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        // Restreindre la commande au serveur avec l'ID 1276577184244563968
-        const allowedGuildId = '1276577184244563968';
+        // Restreindre la commande au serveur avec l'ID
+        const allowedGuildId = 'Votre ID serveur discord';
         if (interaction.guild.id !== allowedGuildId) {
             return interaction.reply({
                 content: "Cette commande n'est disponible que sur le serveur support du bot.",
