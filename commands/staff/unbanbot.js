@@ -17,7 +17,7 @@ module.exports = {
         ),
     async execute(interaction) {
         // Vérifier que la commande est exécutée sur le serveur de support
-        if (interaction.guild.id !== '1276577184244563968') {
+        if (interaction.guild.id !== 'Votre ID serveur discord') {
             return interaction.reply({
                 content: 'Cette commande n\'est disponible que sur le serveur de support.',
                 ephemeral: true
