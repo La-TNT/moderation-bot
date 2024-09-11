@@ -77,6 +77,10 @@ module.exports = {
                             { name: '/start', value: 'Démarrer le processus de vérification.' },
                             { name: '/verification', value: 'Utilisez cette commande pour vous vérifier.' },
                             { name: '/banbot', value: 'Ban le bot d un serveur.' },
+                            { name: '/ping', value: 'Verifie la latence du bot.' },
+                            { name: '/unbanbot', value: 'Débannir le bot d un serveur.' },
+                            { name: '/recherche', value: 'Recherche d images sur Google.' },
+                            { name: '/serveur-info', value: 'Obtenir les informations d un serveur à partir d un lien d invitation ou de son ID.' },
                             { name: '/aide', value: 'Affiche cette liste des commandes disponibles.' }
                         )
                         .setFooter({ text: 'Utilisez /aide <commande> pour plus de détails sur une commande spécifique.' })

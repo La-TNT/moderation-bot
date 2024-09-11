@@ -4,7 +4,7 @@ const wait = require('node:timers/promises').setTimeout;
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ping")
-        .setDescription("Pong !"),
+        .setDescription("Verifie la latence du bot."),
     async execute(interaction) {
 
         // Au début, nous différons pour éviter l'échec de l'interaction Discord
