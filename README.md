@@ -10,7 +10,7 @@ https://developers.google.com/
 https://programmablesearchengine.google.com/
 https://cloud.mongodb.com/
 
-Avertissement:
+⚠️Avertissement⚠️:
 A modifier votre token [Bot] (.env)
 votre id [Bot] (.env)
 (pas obligatoir) MONGO (.env)
