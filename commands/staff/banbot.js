@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Utilisez directement le chemin complet sans la variable blacklistDir
-const blacklistFile = path.join(__dirname, 'staff', 'blacklist.json');
+const blacklistFile = path.join(__dirname, 'blacklist.json');
 
 // Charger ou initialiser la liste noire des serveurs
 let blacklist = [];
