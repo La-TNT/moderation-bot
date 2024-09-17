@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Chemin vers la blacklist
-const blacklistFile = path.join(__dirname, 'staff', 'blacklist.json');
+const blacklistFile = path.join(__dirname, 'blacklist.json');
 
 // Charger la liste noire des serveurs
 let blacklist = [];
