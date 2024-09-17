@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 
-const googleApiKey = 'AIzaSyCzaZH72xpNCwECkqvjJD0KC7l67V2H0H4'; // Votre clé API Google
-const searchEngineId = '92bbfef2667cc40f9'; // Votre ID de moteur de recherche
+const googleApiKey = 'ICI'; // Votre clé API Google
+const searchEngineId = 'ICI'; // Votre ID de moteur de recherche
 
 module.exports = {
     data: new SlashCommandBuilder()
