@@ -24,7 +24,7 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        const supportServerId = '1276577184244563968'; // Remplace par l'ID de ton serveur support
+        const supportServerId = ''; // Remplace par l'ID de ton serveur support
         const userServerId = interaction.guild.id;
 
         // Vérifier si la commande est utilisée sur le serveur support
