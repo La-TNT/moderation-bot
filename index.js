@@ -82,6 +82,37 @@ client.on('guildCreate', async (guild) => {
     }
 });
 
+client.on('messageCreate', async (message) => {
+    const event = require('./events/messageCreate.js');
+    await event.execute(message);
+});
+
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isButton()) return;
+
+    if (interaction.customId === 'obtenir_recompense') {
+        const drop = await db.get('current_drop');
+        if (!drop) {
+            return interaction.reply({ content: 'Aucun drop en cours.', ephemeral: true });
+        }
+
+        // Vérifier la condition ici (exemple : vérifier si l'utilisateur a envoyé 100 messages)
+        const userMessages = await db.get(`user_${interaction.user.id}_messages`) || 0;
+        const conditionMessages = parseInt(drop.condition.match(/\d+/)); // Extrait un nombre de la condition
+
+        if (userMessages >= conditionMessages) {
+            // Ajouter la récompense à l'utilisateur
+            const userCurrency = await db.get(`user_${interaction.user.id}_${drop.recompense}`) || 0;
+            await db.set(`user_${interaction.user.id}_${drop.recompense}`, userCurrency + drop.montant);
+
+            await interaction.reply({ content: `Félicitations ! Vous avez obtenu ${drop.montant} ${drop.recompense}.`, ephemeral: true });
+        } else {
+            await interaction.reply({ content: `Vous n'avez pas encore rempli la condition pour obtenir la récompense. Condition: ${drop.condition}`, ephemeral: true });
+        }
+    }
+});
+
 // Gérez les erreurs non capturées
 process.on('uncaughtException', (err) => {
     const errMsg = err.stack.replace(new RegExp(`${__dirname}/`, 'g'), './');
