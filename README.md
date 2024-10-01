@@ -40,4 +40,5 @@ unbanbot
 unmute  
 unwarn  
 unwarnall  
-warn***  
+warn  
+est bien plus***  
