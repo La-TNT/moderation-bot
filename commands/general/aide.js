@@ -64,6 +64,7 @@ module.exports = {
                         .setTitle('Liste des Commandes')
                         .setDescription('Voici une liste des commandes disponibles sur ce serveur :')
                         .addFields(
+                            { name: '/aide', value: 'Affiche cette liste des commandes disponibles.' },
                             { name: '/config', value: 'Configure les rôles, questions de vérification, et les logs.' },
                             { name: '/warn', value: 'Ajoute un avertissement à un utilisateur. Après 10 avertissements, l\'utilisateur est banni.' },
                             { name: '/unwarn', value: 'Supprime un avertissement d\'un utilisateur.' },
@@ -82,7 +83,22 @@ module.exports = {
                             { name: '/recherche', value: 'Recherche d images sur Google.' },
                             { name: '/serveur-info', value: 'Obtenir les informations d un serveur à partir d un lien d invitation ou de son ID.' },
                             { name: '/serveur-liste', value: 'Affiche la liste des serveurs dans lesquels le bot est présent avec un lien d\'invitation.' },
-                            { name: '/aide', value: 'Affiche cette liste des commandes disponibles.' }
+                            { name: '/balance', value: 'Affiche votre solde de rubis.' },
+                            { name: '/classement', value: 'Affiche le classement des utilisateurs avec le plus de rubis.' },
+                            { name: '/daily', value: 'Réclamez votre récompense quotidienne de rubis.' },
+                            { name: '/drop', value: 'Crée un drop pour une récompense dans un serveur support.' },
+                            { name: '/pay', value: 'Transférer des rubis à un autre utilisateur.' },
+                            { name: '/remove', value: 'Supprime des Rubis, Bonbons, Cœurs ou Œufs d\'un utilisateur.' },
+                            { name: '/balance-coeur', value: 'Affiche le nombre de cœurs que vous possédez.' },
+                            { name: '/calendrier_noel', value: 'Ouvre une case du calendrier de Noël et gagne des Rubis !' },
+                            { name: '/bonbons obtenir', value: 'obtenir des bonbons pour Halloween.' },
+                            { name: '/paque-end', value: 'Termine l\'événement de Pâques..' },
+                            { name: '/paque-participez', value: 'Participez à l\'événement de Pâques et collectez des œufs.' },
+                            { name: '/paque-start', value: 'Commence l\'événement de Pâques.' },
+                            { name: '/valentin-end', value: 'Termine l\'événement de la Saint-Valentin et envoie le leaderboard.' },
+                            { name: '/valentin-participez', value: 'Participez à l’événement de la Saint-Valentin et obtenez des cœurs !' },
+                            { name: '/valentin-start', value: 'Démarre l\'événement de la Saint-Valentin.' },
+                            { name: '/add-rubis', value: 'Ajouter des rubis à un utilisateur.' }
                         )
                         .setFooter({ text: 'Utilisez /aide <commande> pour plus de détails sur une commande spécifique.' })
                 ],

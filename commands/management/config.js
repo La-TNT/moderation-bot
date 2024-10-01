@@ -1,10 +1,12 @@
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js'); 
+const { QuickDB } = require('quick.db');
+const database = new QuickDB();
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config')
         .setDescription('Configure les rôles, questions de vérification, et les logs.')
-        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild) // Disponible uniquement pour les admins
 
         .addSubcommand(subcommand =>
             subcommand
@@ -54,9 +56,32 @@ module.exports = {
                     option
                         .setName("channel")
                         .setDescription("Le canal où les questions de vérification seront posées.")
-                        .setRequired(true))),
+                        .setRequired(true)))
+
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('halloween-leaderboard-channel')
+                .setDescription('Définit le canal où le leaderboard d\'Halloween sera affiché.')
+                .addChannelOption(option =>
+                    option
+                        .setName("channel")
+                        .setDescription("Le canal pour afficher le leaderboard d\'Halloween.")
+                        .setRequired(true)))
+
+        // Nouvelle sous-commande pour le leaderboard de la Saint-Valentin
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('valentin-leaderboard-channel')
+                .setDescription('Définit le canal où le leaderboard de la Saint-Valentin sera affiché.')
+                .addChannelOption(option =>
+                    option
+                        .setName("channel")
+                        .setDescription("Le canal pour afficher le leaderboard de la Saint-Valentin.")
+                        .setRequired(true))
+        ),
 
     async execute(interaction) {
+        // Vérification si la commande est utilisée dans un serveur
         if (!interaction.guild) {
             return interaction.reply({ content: 'Cette commande ne peut pas être utilisée en message privé.', ephemeral: true });
         }
@@ -89,6 +114,19 @@ module.exports = {
             case 'verification-channel':
                 await database.set(`${interaction.guild.id}.verificationChannel`, interaction.options.getChannel("channel").id);
                 await interaction.editReply({ content: `Canal de vérification défini sur \`${interaction.options.getChannel("channel").name}\`.` });
+                break;
+                
+            case 'halloween-leaderboard-channel':
+                const halloweenChannel = interaction.options.getChannel("channel");
+                await database.set(`${interaction.guild.id}.halloweenLeaderboardChannel`, halloweenChannel.id);
+                await interaction.editReply({ content: `Le canal du leaderboard d'Halloween a été défini sur \`${halloweenChannel.name}\`.` });
+                break;
+
+            // Nouvelle gestion pour le canal du leaderboard de la Saint-Valentin
+            case 'valentin-leaderboard-channel':
+                const valentinChannel = interaction.options.getChannel("channel");
+                await database.set(`${interaction.guild.id}.valentineLeaderboardChannel`, valentinChannel.id);
+                await interaction.editReply({ content: `Le canal du leaderboard de la Saint-Valentin a été défini sur \`${valentinChannel.name}\`.` });
                 break;
 
             default:
