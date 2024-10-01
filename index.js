@@ -82,11 +82,16 @@ client.on('guildCreate', async (guild) => {
     }
 });
 
+// Définir l'activité du bot
+client.once('ready', () => {
+    client.user.setActivity("Surveille le serveur", { type: "WATCHING" });
+    console.log(`Connecté en tant que ${client.user.tag}`);
+});
+
 client.on('messageCreate', async (message) => {
     const event = require('./events/messageCreate.js');
     await event.execute(message);
 });
-
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return;
