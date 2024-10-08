@@ -14,7 +14,8 @@ https://cloud.mongodb.com/
 A modifier votre token [Bot] (.env)  
 votre id [Bot] (.env)  
 (pas obligatoir) MONGO (.env)  
-L'id du support du bot (\commands\staff\banbot est \commands\staff\unbanbot)  
+L'id du support du bot (\commands\staff\banbot est \commands\staff\unbanbot)
+A modifier ligne 136 les ID dans le index.js  
 
 ***Les commandes:***  
 ***aide  
