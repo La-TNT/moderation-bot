@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const ms = require('ms');
+const mongoose = require('mongoose');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,12 +9,20 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            const verificationChannelId = await database.get(`${interaction.guild.id}.verificationChannel`);
+            const db = mongoose.connection.db;  // Connexion à la base de données MongoDB
+
+            // Récupérer la configuration
+            const settings = await db.collection('guildConfigs').findOne({ guildId: interaction.guild.id });
+            if (!settings) {
+                return interaction.reply({ content: 'Les paramètres du serveur ne sont pas configurés.', ephemeral: true });
+            }
+
+            const verificationChannelId = settings.verificationChannel;
             if (interaction.channel.id !== verificationChannelId) {
                 return interaction.reply({ content: 'Cette commande doit être utilisée dans le salon de vérification.', ephemeral: true });
             }
 
-            const verifyRoleId = await database.get(`${interaction.guild.id}.verifyRole`);
+            const verifyRoleId = settings.memberRole;
             if (!verifyRoleId) {
                 return interaction.reply({ content: 'Le rôle de vérification n\'est pas configuré.', ephemeral: true });
             }
@@ -25,8 +34,8 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            const verifyQuestion = await database.get(`${interaction.guild.id}.verifyQuestions`);
-            const logChannelId = await database.get(`${interaction.guild.id}.logChannel`);
+            const verifyQuestion = settings.verifyQuestions;
+            const logChannelId = settings.logChannel;
             const logChannel = interaction.guild.channels.cache.get(logChannelId);
 
             await interaction.editReply({ content: `:question: **Question de vérification :** ${verifyQuestion}` });
@@ -40,58 +49,20 @@ module.exports = {
 
             if (collected && collected.size > 0) {
                 const response = collected.first();
-                const responseText = response.content.toLowerCase();
+                const responseText = response.content.trim().toLowerCase();
 
                 await response.delete();
 
-                if (responseText === 'oui') {
-                    const verifyRole = interaction.guild.roles.cache.get(verifyRoleId);
-                    if (verifyRole) {
-                        await member.roles.add(verifyRole);
-                        await interaction.editReply(`Vous avez été vérifié et le rôle ${verifyRole.name} vous a été attribué.`);
-                    } else {
-                        await interaction.editReply('Le rôle de vérification n\'est pas configuré ou n\'existe pas.');
-                    }
+                const verifyRole = interaction.guild.roles.cache.get(verifyRoleId);
+                if (responseText === 'oui' && verifyRole) {
+                    await member.roles.add(verifyRole);
+                    await interaction.editReply(`Vous avez été vérifié et le rôle ${verifyRole.name} vous a été attribué.`);
                 } else if (responseText === 'non') {
-                    try {
-                        // Envoyer un message privé avant d'expulser l'utilisateur
-                        try {
-                            await member.send(`Vous avez été expulsé du serveur **${interaction.guild.name}** pour la raison suivante : Réponse négative à la vérification.`);
-                        } catch (error) {
-                            if (error.code === 50007) {
-                                console.error('Impossible d\'envoyer un message privé à l’utilisateur expulsé : l\'utilisateur a désactivé les messages privés.');
-                            } else {
-                                console.error('Erreur inattendue lors de l\'envoi d\'un message privé à l\'utilisateur expulsé :', error);
-                            }
-                        }
-
-                        // Expulser l'utilisateur
-                        await member.kick('Réponse négative à la vérification');
-                        await interaction.editReply('Vous avez été expulsé pour avoir répondu non.');
-                    } catch (error) {
-                        console.error('Erreur lors de l\'expulsion du membre:', error);
-                        await interaction.editReply('Une erreur est survenue lors de votre expulsion.');
-                    }
+                    await member.kick('Réponse négative à la vérification');
+                    await interaction.editReply('Vous avez été expulsé pour avoir répondu non.');
                 } else {
                     await member.timeout(ms('4d'), 'Réponse invalide à la vérification');
                     await interaction.editReply('Vous avez été mis en mute pendant 4 jours pour avoir donné une réponse invalide.');
-
-                    try {
-                        await member.send(`Vous avez été mis en mute sur le serveur **${interaction.guild.name}** pour la raison suivante : Réponse invalide à la vérification. Durée du mute : 4 jours.`);
-                    } catch (error) {
-                        console.error('Impossible d\'envoyer un message privé à l’utilisateur mis en mute:', error);
-                    }
-
-                    if (logChannel) {
-                        await logChannel.send({
-                            content: `:mute: **${interaction.user.tag}** (ID: ${interaction.user.id}) a été mis en mute pour 4 jours pour avoir donné une réponse invalide.`,
-                            embeds: [new EmbedBuilder()
-                                .setColor('#e82631')
-                                .setTitle('Mute')
-                                .setDescription(`Utilisateur : ${interaction.user.tag} (ID: ${interaction.user.id})\nRaison : Réponse invalide à la vérification\nDurée : 4 jours`)
-                            ],
-                        });
-                    }
                 }
             }
         } catch (error) {
